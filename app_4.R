@@ -72,10 +72,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme("united"), #add a theme!
                                       max = 5,
                                       value = c(1,5)),
                           
+                          
+                          shiny::actionButton(inputId = "goButton", "Filter dogs!")
                           # action button to initiate filtering
-                          shinyWidgets::actionBttn("goButton", "Filter dogs!",
-                                                   color = "success", 
-                                                   style = "pill")
+                          # shinyWidgets::actionBttn("goButton", "Filter dogs!",
+                          #                          color = "success", 
+                          #                          style = "pill")
                           
                           
                         ),
@@ -114,26 +116,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme("united"), #add a theme!
                             tabPanel("Other characteristics", plotOutput("bar_characteristics", height = "600px")),
                             # OUTPUT: line plot of popularity for given breed(s) over time
                             tabPanel("Popularity over time", plotOutput("popularity",  height = "600px"))
-                          )))),
-              # page 4
-             tabPanel("About",
-                      fluidRow(
-                        column(width=7,
-                      h4("This app was created by Kaitlyn Hair as an example app for an", em("Introduction to R Shiny"), " workshop at",
-                      tags$a(href="https://esmarconf.org/", strong("ESMARConf2023")),
-                      br(),
-                      br(),
-                      "All materials relating to this workshop can materials can be found on ", tags$a(href="https://github.com/kaitlynhair/dog_breed_explorer", strong("this Github repository")),
-                      br(),
-                      br(),
-                      "This app was motivated by a ", tags$a(href="https://github.com/rfordatascience/tidytuesday", strong("#TidyTuesday dogs dataset")), "from February 2022.",
-                      br(),
-                      br(),
-                      "This idea was also inspired by Kaitlyn's English Cocker Spaniel Alfie, who happens to be an extremely good boy (most of the time)!", icon("paw")),
-                      ),
-                      column(width = 5,
-                             img(src='alfie.jpg', align = "centre", width="500px"))))
-             ))
+                          ))))))
+           
 
 
 
@@ -146,7 +130,7 @@ server <- function(input, output) {
     # Take a dependency on input$goButton
     input$goButton
     
-    # creating a dataframe with the input filters applied 
+    # creating a dataframe with the input filters applied
     df <- dogs %>%
       filter(openness_to_strangers >= isolate(input$openness_level[1])) %>%
       filter(openness_to_strangers <= isolate(input$openness_level[2])) %>%
@@ -163,6 +147,23 @@ server <- function(input, output) {
       rename(rank = x2020_rank) %>%
       select(rank, breed, image) %>%
       mutate(image = paste0("<img src=", "'", image, "'", " height='72'></img>"))
+    
+    # df <- dogs %>%
+    #   filter(openness_to_strangers >= input$openness_level[1]) %>%
+    #   filter(openness_to_strangers <= input$openness_level[2]) %>%
+    #   filter(energy_level >= input$energy_level[1]) %>%
+    #   filter(energy_level <= input$energy_level[2]) %>%
+    #   filter(barking_level >= input$barking_level[1]) %>%
+    #   filter(barking_level <= input$barking_level[2]) %>%
+    #   filter(playfulness_level >= input$playfulness_level[1]) %>%
+    #   filter(playfulness_level <= input$playfulness_level[2]) %>%
+    #   filter(size_category %in% input$size) %>%
+    #   filter(coat_type %in% input$coat) %>%
+    #   select(breed, x2020_rank, image) %>%
+    #   arrange(x2020_rank) %>%
+    #   rename(rank = x2020_rank) %>%
+    #   select(rank, breed, image) %>%
+    #   mutate(image = paste0("<img src=", "'", image, "'", " height='72'></img>"))
     
     # rendering a datatable using that data
     DT::datatable(df, rownames = FALSE, options = list(pageLength = 10), escape=FALSE) # escape is false to allow HTML code in images
@@ -201,8 +202,8 @@ server <- function(input, output) {
     data <- selected_dogs()[,c(1,6:8, 14:21)]
     
     # user feedback
-    smaller_than_4 <- length(input$breed) < 4
-    shinyFeedback::feedbackWarning("breed", !smaller_than_4, "Please select three or fewer breeds to compare!")
+    # more_than_3 <- length(input$breed) > 3 #logical value
+    # shinyFeedback::feedbackWarning(inputId = "breed", show = more_than_3, text = "Please select three or fewer breeds to compare!")
 
     # make breed the row name
     rownames(data) <- paste0(data$breed)
@@ -259,37 +260,6 @@ server <- function(input, output) {
       scale_colour_manual(values = c(rgb(0.2,0.5,0.5,0.9), rgb(0.8,0.2,0.5,0.9) , rgb(0.7,0.5,0.1,0.9))
       )
   })
-  
- output$trait_bubble <-  plotly::renderPlotly({
-   
-  # create bubble plot
-  p <- ggplot(top_dogs, aes(fill = breed,
-                      x=.data[[input$trait_selection]], y=avg_weight_kg)) +
-    geom_point(alpha=0.5, size=5) +
-    viridis::scale_color_viridis(discrete=TRUE, guide=FALSE) +
-    xlab(snakecase::to_title_case(input$trait_selection)) + ylab("Weight (kg)") +  theme_light()  +
-    theme(legend.position = "none")
-  
-  # use plotly for interactivity
-  plotly::ggplotly(p) %>% plotly::event_register('plotly_click')
-  
-})
- 
- # generate output image based on clicked bubble plot selection
- observeEvent(plotly::event_data("plotly_click"), { 
-   
-    point <- plotly::event_data("plotly_click")
-    dogs_selected <- top_dogs %>%
-      filter(avg_weight_kg == paste0(point$y)) %>%
-      mutate(image = paste0("<img src=", "'", image, "'", " height='250'></img>"))
-    
-    
-     output$dog_pic <- renderText(
-       
-      dogs_selected$image
-        
-     )
- })
 
  
 }

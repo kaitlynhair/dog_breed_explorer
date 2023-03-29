@@ -12,7 +12,7 @@ ui <- fluidPage(
     # Application title
     titlePanel("Dog Breed Explorer"),
 
-    # Sidebar with a slider input for number of bins 
+    # Sidebar layout
     sidebarLayout(
         sidebarPanel(
           
@@ -36,22 +36,22 @@ ui <- fluidPage(
                       label = "Opennness with strangers",
                       min = 1,
                       max = 5,
-                      value = c(1,5)),
+                      value = c(1,3)),
           sliderInput(inputId= "playfulness_level",
                       label = "Playfulness",
                       min = 1,
                       max = 5,
-                      value = c(1,5)),
+                      value = c(1,3)),
           sliderInput(inputId ="energy_level",
                       label = "Energy levels",
                       min = 1,
                       max = 5,
-                      value = c(1,5)),
+                      value = c(1,2)),
           sliderInput(inputId ="barking_level",
                       label = "Barking tendencies",
                       min = 1,
                       max = 5,
-                      value = c(1,5)),
+                      value = c(1,2)),
           
           
         ),
@@ -69,32 +69,31 @@ ui <- fluidPage(
 # server
 server <- function(input, output) {
     
-  # Output - pop table
-  # create datatable with dog popularity rankings
-  output$pop_table <- DT::renderDataTable({
+# Output - pop table
+# create datatable with dog popularity rankings
+output$pop_table <- DT::renderDataTable({
 
-    browser()
-    
-    # filter with slider options
-    df <- dogs %>%
-      filter(openness_to_strangers >= input$openness_level[1]) %>%
-      filter(openness_to_strangers <= input$openness_level[2]) %>%
-      filter(energy_level >= input$energy_level[1]) %>%
-      filter(energy_level <= input$energy_level[2]) %>%
-      filter(barking_level >= input$barking_level[1]) %>%
-      filter(barking_level <= input$barking_level[2]) %>%
-      filter(playfulness_level >= input$playfulness_level[1]) %>%
-      filter(playfulness_level <= input$playfulness_level[2]) %>%
-      filter(size_category %in% input$size) %>%
-      filter(coat_type %in% input$coat) %>%
-      select(breed, x2020_rank, image) %>%
-      arrange(x2020_rank) %>%
-      rename(rank = x2020_rank) %>%
-      select(rank, breed, image) %>%
-      mutate(image = paste0("<img src=", "'", image, "'", " height='72'></img>"))
+#  browser()
+  
+  # filter with slider options
+  df <- dogs %>%
+    filter(openness_to_strangers >= input$openness_level[1]) %>%
+    filter(openness_to_strangers <= input$openness_level[2]) %>%
+    filter(energy_level >= input$energy_level[1]) %>%
+    filter(energy_level <= input$energy_level[2]) %>%
+    filter(barking_level >= input$barking_level[1]) %>%
+    filter(barking_level <= input$barking_level[2]) %>%
+    filter(playfulness_level >= input$playfulness_level[1]) %>%
+    filter(playfulness_level <= input$playfulness_level[2]) %>%
+    filter(size_category %in% input$size) %>%
+    filter(coat_type %in% input$coat) %>%
+    select(breed, x2020_rank) %>%
+    arrange(x2020_rank) %>%
+    rename(rank = x2020_rank) %>%
+    select(rank, breed) 
 
-    # rendering a datatable using that data
-    DT::datatable(dogs, rownames = FALSE, options = list(pageLength = 10), escape=FALSE) # escape is false to allow HTML code in images
+  # rendering a datatable using that data
+  DT::datatable(df, rownames = FALSE, options = list(pageLength = 10))
 
   })
 }

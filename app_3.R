@@ -7,7 +7,7 @@ library(DT)
 dogs <- read.csv("dogs.csv")
 
 # define UI 
-ui <- fluidPage(
+ui <- fluidPage(theme = shinythemes::shinytheme("united"),
   
   # navbar page layout with pages at top
   navbarPage("Dog Breed Explorer",
@@ -59,10 +59,6 @@ ui <- fluidPage(
                                   max = 5,
                                   value = c(1,5)),
                       
-                      # action button to initiate filtering
-                      actionButton("goButton", "Filter dogs!")
-                      
-                      
                       
              ),
              
@@ -107,27 +103,24 @@ server <- function(input, output) {
   
   # create datatable with dog popularity rankings
   output$rank_table <- DT::renderDataTable({
-    
-    # Take a dependency on input$goButton
-    input$goButton
-    
+  
     # creating a dataframe with the input filters applied 
     df <- dogs %>%
-      filter(openness_to_strangers >= isolate(input$openness_level[1])) %>%
-      filter(openness_to_strangers <= isolate(input$openness_level[2])) %>%
-      filter(energy_level >= isolate(input$energy_level[1])) %>%
-      filter(energy_level <= isolate(input$energy_level[2])) %>%
-      filter(barking_level >= isolate(input$barking_level[1])) %>%
-      filter(barking_level <= isolate(input$barking_level[2])) %>%
-      filter(playfulness_level >= isolate(input$playfulness_level[1])) %>%
-      filter(playfulness_level <= isolate(input$playfulness_level[2])) %>%
-      filter(size_category %in% isolate(input$size)) %>%
-      filter(coat_type %in% isolate(input$coat)) %>%
+      filter(openness_to_strangers >= input$openness_level[1]) %>%
+      filter(openness_to_strangers <= input$openness_level[2]) %>%
+      filter(energy_level >= input$energy_level[1]) %>%
+      filter(energy_level <= input$energy_level[2]) %>%
+      filter(barking_level >= input$barking_level[1]) %>%
+      filter(barking_level <= input$barking_level[2]) %>%
+      filter(playfulness_level >= input$playfulness_level[1]) %>%
+      filter(playfulness_level <= input$playfulness_level[2]) %>%
+      filter(size_category %in% input$size) %>%
+      filter(coat_type %in% input$coat) %>%
       select(breed, x2020_rank, image) %>%
       arrange(x2020_rank) %>%
       rename(rank = x2020_rank) %>%
       select(rank, breed, image) %>%
-      mutate(image = paste0("<img src=", "'", image, "'", " height='72'></img>"))
+      mutate(image = paste0("<img src=", "'", image, "'", " height = '72'></img>"))
     
     # rendering a datatable using that data
     DT::datatable(df, rownames = FALSE, options = list(pageLength = 10), escape=FALSE) # escape is false to allow HTML code in images
