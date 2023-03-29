@@ -5,11 +5,12 @@ library(DT)
 
 # read in data
 dogs <- read.csv("dogs.csv")
-top_dogs <- dogs %>% filter(x2020_rank < 25) %>%
-  arrange(breed)
 
 # define UI 
-ui <- fluidPage(theme = shinythemes::shinytheme("united"),
+ui <- fluidPage(theme = shinythemes::shinytheme("united"), #add a theme!
+  
+  # use shiny feedback              
+  shinyFeedback::useShinyFeedback(),
   
   # navbar page layout with pages at top
   navbarPage("Dog Breed Explorer",
@@ -49,10 +50,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme("united"),
                           br(), # blank row
                           
                           # INPUT: sliders for personality traits
-                          
-                          # HTML styling for colour of barstags$head(tags$style(
-                          shinyWidgets::setSliderColor(c("Orange ", "Orange", "Orange", "Orange"), c(1, 2, 3, 4)),
-                          
                           # sliders
                           sliderInput("openness_level",
                                       label = "Opennness with strangers",
@@ -118,19 +115,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme("united"),
                             # OUTPUT: line plot of popularity for given breed(s) over time
                             tabPanel("Popularity over time", plotOutput("popularity",  height = "600px"))
                           )))),
-           
-              # page 3
-             tabPanel("Size vs Trait Explorer",
-                        fluidRow(width=12,
-                        column(width=6,
-                      selectInput("trait_selection", label="Select a trait to visualise against breed size", 
-                                  choices = names(dogs[,c(6:8, 14:21)])),
-                      plotly::plotlyOutput("trait_bubble", height = "500px", width = "600px")),
-                      column(width=6,
-                      h4("Click a point to see the chosen breed below:"),
-                      htmlOutput("dog_pic")))),
-                      
-                      
               # page 4
              tabPanel("About",
                       fluidRow(
@@ -216,6 +200,10 @@ server <- function(input, output) {
     # select relevant columns of reactive dataframe
     data <- selected_dogs()[,c(1,6:8, 14:21)]
     
+    # user feedback
+    smaller_than_4 <- length(input$breed) < 4
+    shinyFeedback::feedbackWarning("breed", !smaller_than_4, "Please select three or fewer breeds to compare!")
+
     # make breed the row name
     rownames(data) <- paste0(data$breed)
     data <- data %>%
@@ -275,12 +263,8 @@ server <- function(input, output) {
  output$trait_bubble <-  plotly::renderPlotly({
    
   # create bubble plot
-  
-  # sym function to unquote input for use in ggplot
-  xval <- ggplot2::sym(input$trait_selection)
-  
   p <- ggplot(top_dogs, aes(fill = breed,
-                      x=!!xval, y=avg_weight_kg)) +
+                      x=.data[[input$trait_selection]], y=avg_weight_kg)) +
     geom_point(alpha=0.5, size=5) +
     viridis::scale_color_viridis(discrete=TRUE, guide=FALSE) +
     xlab(snakecase::to_title_case(input$trait_selection)) + ylab("Weight (kg)") +  theme_light()  +
