@@ -33,7 +33,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme("united"),
                                   selected = unique(dogs$coat_type),
                                   multiple = TRUE),
                       
-                      h2("Personality traits"),
+                      h4("Personality traits"),
                       h5("Scored from 1:5, with 5 indicating the HIGHEST level e.g. most friendly, most playful"),
                       br(), # blank row
                       

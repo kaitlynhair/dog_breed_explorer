@@ -48,7 +48,12 @@ server <- function(input, output) {
   # # render radar plot with personality traits
   output$radar_pers <-renderPlot({
 
-    # select relevant columns of reactive dataframe
+    # computation needed
+    # df <- dogs %>%
+    #   filter(breed %in% input$breed)
+    # data <- df[,c(1,6:8, 14:21)]
+    
+    # select relevant columns of reactive dataframe instead
     data <- selected_dogs()[,c(1,6:8, 14:21)]
 
     # make breed the row name

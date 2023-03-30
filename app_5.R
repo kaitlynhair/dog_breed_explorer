@@ -14,7 +14,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme("united"),
                 # use shiny feedback              
                 shinyFeedback::useShinyFeedback(),
                 
-                
                 # navbar page layout with pages at top
                 navbarPage("Dog Breed Explorer",
                            
@@ -283,6 +282,7 @@ server <- function(input, output) {
   output$trait_bubble <-  plotly::renderPlotly({
     
     # create bubble plot
+    # tidy evaluation here to pass the input$trait_selection argument for x
     p <- ggplot(top_dogs, aes(fill = breed,
                               x=.data[[input$trait_selection]], y=avg_weight_kg)) +
       geom_point(alpha=0.5, size=5) +

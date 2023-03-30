@@ -1,3 +1,4 @@
+# load packages
 library(ggplot2)
 library(shiny)
 library(dplyr)
@@ -27,8 +28,12 @@ ui <- fluidPage(
                       selected = unique(dogs$coat_type), #select all as default
                       multiple = TRUE),
           
-          h2("Personality traits"),
+          # Header for new section
+          h4("Personality traits"),
+          
+          # Descriptive text about scoring
           h5("Scored from 1:5, with 5 indicating the HIGHEST level e.g. most friendly, most playful"),
+          
           br(), # blank row
 
           # INPUT: sliders for personality traits
@@ -46,18 +51,19 @@ ui <- fluidPage(
                       label = "Energy levels",
                       min = 1,
                       max = 5,
-                      value = c(1,2)),
+                      value = c(1,4)),
           sliderInput(inputId ="barking_level",
                       label = "Barking tendencies",
                       min = 1,
                       max = 5,
-                      value = c(1,2)),
+                      value = c(1,4)),
           
           
         ),
     
         # Show a plot of the generated distribution
         mainPanel(
+          # header
           h3("Most popular dogs"),
           
           # OUTPUT: datatable showing most popular dogs within criteria
@@ -75,7 +81,7 @@ output$pop_table <- DT::renderDataTable({
 
 #  browser()
   
-  # filter with slider options
+  # filter with slider input value
   df <- dogs %>%
     filter(openness_to_strangers >= input$openness_level[1]) %>%
     filter(openness_to_strangers <= input$openness_level[2]) %>%
