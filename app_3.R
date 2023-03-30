@@ -120,7 +120,7 @@ server <- function(input, output) {
       arrange(x2020_rank) %>%
       rename(rank = x2020_rank) %>%
       select(rank, breed, image) %>%
-      mutate(image = paste0("<img src=", "'", image, "'", " height = '72'></img>"))
+      mutate(image = paste0("<img src=", "'", image, "'", " height = '72'>")) # HTML code
     
     # rendering a datatable using that data
     DT::datatable(df, rownames = FALSE, options = list(pageLength = 10), escape=FALSE) # escape is false to allow HTML code in images

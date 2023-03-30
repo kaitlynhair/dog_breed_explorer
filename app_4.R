@@ -146,7 +146,7 @@ server <- function(input, output) {
       arrange(x2020_rank) %>%
       rename(rank = x2020_rank) %>%
       select(rank, breed, image) %>%
-      mutate(image = paste0("<img src=", "'", image, "'", " height='72'></img>"))
+      mutate(image = paste0("<img src=", "'", image, "'", " height='72'>"))
     
     # df <- dogs %>%
     #   filter(openness_to_strangers >= input$openness_level[1]) %>%
