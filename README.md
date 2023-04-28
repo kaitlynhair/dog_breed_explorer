@@ -1,5 +1,5 @@
 #  Dog Breed Explorer Shiny App
-This repo contains materials from my EMSAR 2023 Introduction to Shiny workshop
+This repo contains materials from my EMSAR 2023 Introduction to Shiny workshop available at: https://www.youtube.com/watch?v=2mcjWh3ZYS4 
 
 # Applications
 There are 5 applications of increasing complexity included here. The final one, app_5.R is available as a Shiny app online https://camarades.shinyapps.io/dog_breed_explorer/
